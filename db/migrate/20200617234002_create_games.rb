@@ -3,7 +3,7 @@ class CreateGames < ActiveRecord::Migration[6.0]
     create_table :games do |t|
       t.string :name
       t.string :status
-      t.number :time
+      t.numeric :time
 
       t.timestamps
     end
