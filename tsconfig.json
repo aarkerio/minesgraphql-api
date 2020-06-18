@@ -8,6 +8,8 @@
     "module": "es6",
     "moduleResolution": "node",
     "sourceMap": true,
+    "declaration": true,
+    "esModuleInterop": true,
     "target": "es5",
     "jsx": "react"
   },

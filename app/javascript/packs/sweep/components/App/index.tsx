@@ -9,13 +9,13 @@ import { MAX_COLS, MAX_ROWS } from "../../constants";
 import "./App.scss";
 
 const App: React.FC = () => {
-  const [cells, setCells] = useState<Cell[][]>(generateCells());
-  const [face, setFace] = useState<Face>(Face.smile);
-  const [time, setTime] = useState<number>(0);
-  const [live, setLive] = useState<boolean>(false);
+  const [cells, setCells]             = useState<Cell[][]>(generateCells());
+  const [face, setFace]               = useState<Face>(Face.smile);
+  const [time, setTime]               = useState<number>(0);
+  const [live, setLive]               = useState<boolean>(false);
   const [bombCounter, setBombCounter] = useState<number>(10);
-  const [hasLost, setHasLost] = useState<boolean>(false);
-  const [hasWon, setHasWon] = useState<boolean>(false);
+  const [hasLost, setHasLost]         = useState<boolean>(false);
+  const [hasWon, setHasWon]           = useState<boolean>(false);
 
   useEffect(() => {
     const handleMouseDown = (): void => {
