@@ -2,7 +2,9 @@ class Game < ApplicationRecord
   has_many :tiles
   has_many :mines
 
-  after_create :generate_board
+  def self.best_records(limit=10)
+    Game.order(time: :desc).limit(limit)
+  end
 
   def generate_board
     (1..8).each do |x|

@@ -1,19 +1,18 @@
 import { MAX_COLS, MAX_ROWS, NO_OF_BOMBS } from "../constants";
 import { Cell, CellState, CellValue } from "../types";
 
-
-interface allCells {
-    topLeftCell: Cell | null
-    topCell: Cell | null
-    topRightCell: Cell | null
-    leftCell: Cell | null
-    rightCell: Cell | null
-    bottomLeftCell: Cell | null
-    bottomCell: Cell | null
-    bottomRightCell: Cell | null
+interface IAllCells {
+  topLeftCell: Cell | null;
+  topCell: Cell | null;
+  topRightCell: Cell | null;
+  leftCell: Cell | null;
+  rightCell: Cell | null;
+  bottomLeftCell: Cell | null;
+  bottomCell: Cell | null;
+  bottomRightCell: Cell | null;
 }
 
-const grabAllAdjacentCells = (cells: Cell[][], rowParam: number, colParam: number): allCells => {
+const grabAllAdjacentCells = (cells: Cell[][], rowParam: number, colParam: number): IAllCells => {
   const topLeftCell     = rowParam > 0 && colParam > 0 ? cells[rowParam - 1][colParam - 1] : null;
   const topCell         = rowParam > 0 ? cells[rowParam - 1][colParam] : null;
   const topRightCell    = rowParam > 0 && colParam < MAX_COLS - 1 ? cells[rowParam - 1][colParam + 1] : null;
@@ -56,7 +55,7 @@ export const generateCells = (): Cell[][] => {
     const randomCol = Math.floor(Math.random() * MAX_COLS);
 
     const currentCell = cells[randomRow][randomCol];
-    if (currentCell.value !== CellValue.bomb) {
+    if (currentCell.value !== CellValue.bomb) { // don't repeat
       cells = cells.map((row, rowIndex) =>
         row.map((cell, colIndex) => {
           if (randomRow === rowIndex && randomCol === colIndex) {
@@ -73,7 +72,7 @@ export const generateCells = (): Cell[][] => {
     }
   }
 
-  // calculate the numbers for each cell
+  // it calculates the numbers for each cell
   for (let rowIndex = 0; rowIndex < MAX_ROWS; rowIndex++) {
     for (let colIndex = 0; colIndex < MAX_COLS; colIndex++) {
       const currentCell = cells[rowIndex][colIndex];
@@ -81,47 +80,14 @@ export const generateCells = (): Cell[][] => {
         continue;
       }
 
-      let numberOfBombs = 0; // for each cell
-      const {
-        topLeftCell,
-        topCell,
-        topRightCell,
-        leftCell,
-        rightCell,
-        bottomLeftCell,
-        bottomCell,
-        bottomRightCell
-      } = grabAllAdjacentCells(cells, rowIndex, colIndex);
+      const totalBombs = Object.values(grabAllAdjacentCells(cells, rowIndex, colIndex)).reduce((acc, cv) => {
+        return (cv?.value === CellValue.bomb) ? acc + 1 : acc;
+      }, 0);
 
-      if (topLeftCell?.value === CellValue.bomb) {
-        numberOfBombs++;
-      }
-      if (topCell?.value === CellValue.bomb) {
-        numberOfBombs++;
-      }
-      if (topRightCell?.value === CellValue.bomb) {
-        numberOfBombs++;
-      }
-      if (leftCell?.value === CellValue.bomb) {
-        numberOfBombs++;
-      }
-      if (rightCell?.value === CellValue.bomb) {
-        numberOfBombs++;
-      }
-      if (bottomLeftCell?.value === CellValue.bomb) {
-        numberOfBombs++;
-      }
-      if (bottomCell?.value === CellValue.bomb) {
-        numberOfBombs++;
-      }
-      if (bottomRightCell?.value === CellValue.bomb) {
-        numberOfBombs++;
-      }
-
-      if (numberOfBombs > 0) {
+      if (totalBombs > 0) {
         cells[rowIndex][colIndex] = {
           ...currentCell,
-          value: numberOfBombs
+          value: totalBombs
         };
       }
     }
@@ -130,21 +96,15 @@ export const generateCells = (): Cell[][] => {
   return cells;
 };
 
-export const openMultipleCells = (
-  cells: Cell[][],
-  rowParam: number,
-  colParam: number
-): Cell[][] => {
+export const openMultipleCells = (cells: Cell[][],  rowParam: number,  colParam: number): Cell[][] => {
+
   const currentCell = cells[rowParam][colParam];
 
-  if (
-    currentCell.state === CellState.visible ||
-    currentCell.state === CellState.flagged
-  ) {
+  if (currentCell.state === CellState.visible || currentCell.state === CellState.flagged) {
     return cells;
   }
 
-  let newCells = cells.slice();
+  let newCells = [...cells];
   newCells[rowParam][colParam].state = CellState.visible;
 
   const {
@@ -158,10 +118,7 @@ export const openMultipleCells = (
     bottomRightCell
   } = grabAllAdjacentCells(cells, rowParam, colParam);
 
-  if (
-    topLeftCell?.state === CellState.open &&
-    topLeftCell.value !== CellValue.bomb
-  ) {
+  if (topLeftCell?.state === CellState.open && topLeftCell.value !== CellValue.bomb) {
     if (topLeftCell.value === CellValue.none) {
       newCells = openMultipleCells(newCells, rowParam - 1, colParam - 1);
     } else {
@@ -177,10 +134,7 @@ export const openMultipleCells = (
     }
   }
 
-  if (
-    topRightCell?.state === CellState.open &&
-    topRightCell.value !== CellValue.bomb
-  ) {
+  if (topRightCell?.state === CellState.open && topRightCell.value !== CellValue.bomb) {
     if (topRightCell.value === CellValue.none) {
       newCells = openMultipleCells(newCells, rowParam - 1, colParam + 1);
     } else {
@@ -196,10 +150,7 @@ export const openMultipleCells = (
     }
   }
 
-  if (
-    rightCell?.state === CellState.open &&
-    rightCell.value !== CellValue.bomb
-  ) {
+  if (rightCell?.state === CellState.open && rightCell.value !== CellValue.bomb) {
     if (rightCell.value === CellValue.none) {
       newCells = openMultipleCells(newCells, rowParam, colParam + 1);
     } else {
@@ -207,10 +158,7 @@ export const openMultipleCells = (
     }
   }
 
-  if (
-    bottomLeftCell?.state === CellState.open &&
-    bottomLeftCell.value !== CellValue.bomb
-  ) {
+  if (bottomLeftCell?.state === CellState.open && bottomLeftCell.value !== CellValue.bomb) {
     if (bottomLeftCell.value === CellValue.none) {
       newCells = openMultipleCells(newCells, rowParam + 1, colParam - 1);
     } else {
@@ -218,10 +166,7 @@ export const openMultipleCells = (
     }
   }
 
-  if (
-    bottomCell?.state === CellState.open &&
-    bottomCell.value !== CellValue.bomb
-  ) {
+  if (bottomCell?.state === CellState.open && bottomCell.value !== CellValue.bomb) {
     if (bottomCell.value === CellValue.none) {
       newCells = openMultipleCells(newCells, rowParam + 1, colParam);
     } else {
@@ -229,10 +174,7 @@ export const openMultipleCells = (
     }
   }
 
-  if (
-    bottomRightCell?.state === CellState.open &&
-    bottomRightCell.value !== CellValue.bomb
-  ) {
+  if (bottomRightCell?.state === CellState.open && bottomRightCell.value !== CellValue.bomb) {
     if (bottomRightCell.value === CellValue.none) {
       newCells = openMultipleCells(newCells, rowParam + 1, colParam + 1);
     } else {

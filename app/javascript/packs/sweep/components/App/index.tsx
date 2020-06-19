@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 
 import Button from "../Button";
 import NumberDisplay from "../NumberDisplay";
@@ -6,16 +7,28 @@ import { generateCells, openMultipleCells } from "../../utils";
 import { Cell, CellState, CellValue, Face } from "../../types";
 import { MAX_COLS, MAX_ROWS } from "../../constants";
 
+import { RootRState } from "../../redux/index";
+import * as ActionConsults from '../../actions/consults';
+
 import "./App.scss";
 
 const App: React.FC = () => {
+  const dispatch = useDispatch();
+
   const [cells, setCells]             = useState<Cell[][]>(generateCells());
   const [face, setFace]               = useState<Face>(Face.smile);
+  const [records, setRecords]         = useState<any[]>([]);
   const [time, setTime]               = useState<number>(0);
   const [live, setLive]               = useState<boolean>(false);
   const [bombCounter, setBombCounter] = useState<number>(10);
   const [hasLost, setHasLost]         = useState<boolean>(false);
   const [hasWon, setHasWon]           = useState<boolean>(false);
+
+  const  RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.RecordsArray);
+  useEffect(() => dispatch(ActionConsults.loadRecords()),
+            [records]);
+
+  console.log("RecordsArray >> ", RecordsArray);
 
   useEffect(() => {
     const handleMouseDown = (): void => {
@@ -30,7 +43,7 @@ const App: React.FC = () => {
     window.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      window.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mousedown", handleMouseDown);  // release memery
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, []);
@@ -62,7 +75,7 @@ const App: React.FC = () => {
   }, [hasWon]);
 
   const handleCellClick = (rowParam: number, colParam: number) => (): void => {
-    let newCells = cells.slice();
+    let newCells = [...cells];
 
     // start the game
     if (!live) {
@@ -101,17 +114,14 @@ const App: React.FC = () => {
       for (let col = 0; col < MAX_COLS; col++) {
         const currentCell = newCells[row][col];
 
-        if (
-          currentCell.value !== CellValue.bomb &&
-          currentCell.state === CellState.open
-        ) {
+        if (currentCell.value !== CellValue.bomb && currentCell.state === CellState.open) {
           safeOpenCellsExists = true;
           break;
         }
       }
     }
 
-    if (!safeOpenCellsExists) {
+    if (!safeOpenCellsExists) {  // you won!!
       newCells = newCells.map(row =>
         row.map(cell => {
           if (cell.value === CellValue.bomb) {
@@ -138,7 +148,7 @@ const App: React.FC = () => {
       return;
     }
 
-    const currentCells = cells.slice();
+    const currentCells = [...cells];
     const currentCell = cells[rowParam][colParam];
 
     if (currentCell.state === CellState.visible) {
@@ -180,7 +190,7 @@ const App: React.FC = () => {
   };
 
   const showAllBombs = (): Cell[][] => {
-    const currentCells = cells.slice();
+    const currentCells = [...cells];
     return currentCells.map(row =>
       row.map(cell => {
         if (cell.value === CellValue.bomb) {

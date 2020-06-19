@@ -19,5 +19,10 @@
     "vendor",
     "public"
   ],
-  "compileOnSave": false
+  "compileOnSave": false,
+  "files": [
+    "index.ts",
+    "types/index.d.ts",
+    "redux/index.d.ts",
+  ]
 }

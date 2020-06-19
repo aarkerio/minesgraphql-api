@@ -12,30 +12,23 @@ const client = new ApolloClient({
   uri: API_URL
 });
 
-function headers() {
-  let headers = {
-        'Accept':       'application/json',
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
-      }
-  return headers;
-}
-
-export const fetchRecords: any = (user_id: number, active:boolean = true) => async (dispatch: any) => {
-
+export const loadRecords: any = () => async (dispatch: any) => {
     try {
-        // Query the data
         const response = await client.query({
             query: gql`{
-             rates(currency: "USD") {
-             currency
-            }
-          }
-        `});
-        const result = dispatch(JSON.stringify(response));
-        return result;
+                 getRecords(limit: 6) { id name time}
+            }`});
+        console.log("  ############  ** RESPONSE ** :  >>>> ", JSON.stringify(response));
+        dispatch({
+            type: RECEIVE_RECORDS,
+            payload: response.data
+        });
     } catch (err) {
         console.error('Error loading data: >> ', err.toString());
+        dispatch({
+            type: RECEIVE_RECORDS,
+            payload: { msg: err.response.statusText,status: err.response.status }
+        });
     }
 };
 
