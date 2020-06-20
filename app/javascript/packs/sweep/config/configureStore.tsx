@@ -1,32 +1,34 @@
-import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
 import rootReducer from '../redux/index';
 import { routerReducer } from 'react-router-redux';
-
+import thunk from 'redux-thunk';
 declare global {
   interface Window {
     devToolsExtension: any;
   }
 }
 
-export default function configureStore(initialState={}) {
+const configureStore = (initialState={}) => {
 
   const store = createStore(
     combineReducers({
-        rootReducer,
-        routing: routerReducer
-    })
-    ,
+      rootReducer,
+      routing: routerReducer
+    }),
     initialState,
+    applyMiddleware(thunk)
   );
 
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
-    module.hot.accept('../reducers', () => {
-      const nextRootReducer = require('../reducers').default;
+    module.hot.accept('../redux', () => {
+      const nextRootReducer = require('../redux').default;
       store.replaceReducer(nextRootReducer);
     });
   }
-
   return store;
 }
 
+export type storeType  = ReturnType<typeof configureStore>;
+
+export default configureStore;

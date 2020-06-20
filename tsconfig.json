@@ -21,8 +21,7 @@
   ],
   "compileOnSave": false,
   "files": [
-    "index.ts",
-    "types/index.d.ts",
-    "redux/index.d.ts",
+    "app/javascript/packs/sweep/types/index.d.ts",
+    "app/javascript/packs/sweep/redux/index.d.ts",
   ]
 }

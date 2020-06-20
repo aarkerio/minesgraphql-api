@@ -9,8 +9,6 @@ import "./index.scss";
 
 const store = configureStore();
 
-console.log("  ############ rootReducer STORE  :  >>>> " + JSON.stringify(store.getState()));
-
 ReactDOM.render(
   <Provider store={store}>
     <App />

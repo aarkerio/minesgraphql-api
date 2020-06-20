@@ -16,18 +16,39 @@ export const loadRecords: any = () => async (dispatch: any) => {
     try {
         const response = await client.query({
             query: gql`{
-                 getRecords(limit: 6) { id name time}
+                 getRecords(limit: 6) { id name time createdAt }
             }`});
-        console.log("  ############  ** RESPONSE ** :  >>>> ", JSON.stringify(response));
+        console.log("  ############  ** RESPONSE ** :  >>>> ", JSON.stringify(response.data.getRecords));
         dispatch({
             type: RECEIVE_RECORDS,
-            payload: response.data
+            payload: response.data.getRecords
         });
     } catch (err) {
         console.error('Error loading data: >> ', err.toString());
         dispatch({
             type: RECEIVE_RECORDS,
-            payload: { msg: err.response.statusText,status: err.response.status }
+            payload: { msg: err.toString() }
+        });
+    }
+};
+
+export const saveRecord: any = (name: string, time: number) => async (dispatch: any) => {
+    try {
+        const response = await client.query({
+            query: gql`{ mutation {
+                   createRecord(name: ${name},
+                                time: ${time}) { id name time createdAt }
+            }}`});
+        console.log("  ############  ** MUTATION ** :  >>>> ", JSON.stringify(response.data));
+        dispatch({
+            type: RECEIVE_RECORDS,
+            payload: response.data.getRecords
+        });
+    } catch (err) {
+        console.error('Error loading data: >> ', err.toString());
+        dispatch({
+            type: RECEIVE_RECORDS,
+            payload: { msg: err.toString() }
         });
     }
 };

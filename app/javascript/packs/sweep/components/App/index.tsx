@@ -7,14 +7,16 @@ import { generateCells, openMultipleCells } from "../../utils";
 import { Cell, CellState, CellValue, Face } from "../../types";
 import { MAX_COLS, MAX_ROWS } from "../../constants";
 
-import { RootRState } from "../../redux/index";
+import { RootRState } from "../../redux/";
 import * as ActionConsults from '../../actions/consults';
 
 import "./App.scss";
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
-
+  // let RecordsArray = [];
+  // RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.RecordsArray);
+  // console.log("  ############  ** recordas ** :  >>>> ", JSON.stringify(RecordsArray));
   const [cells, setCells]             = useState<Cell[][]>(generateCells());
   const [face, setFace]               = useState<Face>(Face.smile);
   const [records, setRecords]         = useState<any[]>([]);
@@ -24,11 +26,21 @@ const App: React.FC = () => {
   const [hasLost, setHasLost]         = useState<boolean>(false);
   const [hasWon, setHasWon]           = useState<boolean>(false);
 
-  const  RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.RecordsArray);
-  useEffect(() => dispatch(ActionConsults.loadRecords()),
-            [records]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await dispatch(ActionConsults.loadRecords());
 
-  console.log("RecordsArray >> ", RecordsArray);
+      console.log("  ############  ** data in useEffect ** :  >>>> ", JSON.stringify(data));
+
+      setRecords(data);
+    };
+
+    fetchData();
+  }, []);
+  const RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.RecordsArray);
+  console.log("  ############  ** RecordsArray in useEffect ** :  >>>> ", JSON.stringify(RecordsArray));
+
+  console.log("The Records >> ", records);
 
   useEffect(() => {
     const handleMouseDown = (): void => {
@@ -205,17 +217,28 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="App">
-      <div className="Header">
-        <NumberDisplay value={bombCounter} />
-        <div className="Face" onClick={handleFaceClick}>
-          <span role="img" aria-label="face">
-            {face}
-          </span>
+    <div>
+      <div className="App">
+        <div className="Header">
+          <NumberDisplay value={bombCounter} />
+          <div className="Face" onClick={handleFaceClick}>
+            <span role="img" aria-label="face">
+              {face}
+            </span>
+          </div>
+          <NumberDisplay value={time} />
         </div>
-        <NumberDisplay value={time} />
+        <div className="Body">{renderCells()}</div>
       </div>
-      <div className="Body">{renderCells()}</div>
+
+      <div className="records">
+        <h2>Best Records</h2>
+        <table><tr><td>Points</td> <td>Name</td> <td>Done at</td></tr>
+          {RecordsArray?.map((rcd, index) => {
+            return <tr key={ index }><td> {rcd.time} </td> <td> {rcd.name} </td> <td> {rcd.createdAt} </td></tr>;
+          })}
+        </table>
+      </div>
     </div>
   );
 };
