@@ -1,7 +1,9 @@
 import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
+import { DocumentNode } from "graphql";
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import ApolloClient from 'apollo-boost';
 
+export const FETCH_FAILURE    = 'FETCH_FAILURE';
 export const RECEIVE_RECORDS  = 'RECEIVE_RECORDS';
 export const SAVE_GAME        = 'SAVE_GAME';
 export const RESUME_GAME      = 'RESUME_GAME';
@@ -26,7 +28,7 @@ export const loadRecords: any = () => async (dispatch: any) => {
     } catch (err) {
         console.error('Error loading data: >> ', err.toString());
         dispatch({
-            type: RECEIVE_RECORDS,
+            type: FETCH_FAILURE,
             payload: { msg: err.toString() }
         });
     }
@@ -34,20 +36,20 @@ export const loadRecords: any = () => async (dispatch: any) => {
 
 export const saveRecord: any = (name: string, time: number) => async (dispatch: any) => {
     try {
-        const response = await client.query({
-            query: gql`{ mutation {
-                   createRecord(name: ${name},
-                                time: ${time}) { id name time createdAt }
-            }}`});
-        console.log("  ############  ** MUTATION ** :  >>>> ", JSON.stringify(response.data));
+        const mutation: DocumentNode = gql`mutation GET_RECORD($name: String!, $time: Int!)
+                                           {createRecord(name: $name, time: $time) { id name time createdAt }}`;
+
+        const response = await client.mutate({mutation, variables: {name, time}});
+        console.log("  ############  ** RESPONSE SAVE RECORD ** :  >>>> ", JSON.stringify(response));
+
         dispatch({
-            type: RECEIVE_RECORDS,
-            payload: response.data.getRecords
+            type: SAVE_GAME,
+            payload: response.data.createRecord
         });
     } catch (err) {
         console.error('Error loading data: >> ', err.toString());
         dispatch({
-            type: RECEIVE_RECORDS,
+            type: FETCH_FAILURE,
             payload: { msg: err.toString() }
         });
     }

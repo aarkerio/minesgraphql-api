@@ -8,10 +8,12 @@ module Mutations
     type Types::GameType
 
     def resolve(name: nil, time: nil)
-      Game.create!(
-        name: name,
-        time: time,
-      )
+      game = Game.new(name: name, time: time)
+      if game.save
+        game
+      else
+        { id: 0, name: game.errors.full_messages, time: 0 }
+      end
     end
   end
 end

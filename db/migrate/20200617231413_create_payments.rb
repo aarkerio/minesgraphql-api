@@ -4,7 +4,7 @@ class CreatePayments < ActiveRecord::Migration[6.0]
       t.integer :order_id
       t.float :amount
 
-      t.timestamps
+      t.timestamps, null: false, default: "NOW()"
     end
   end
 end

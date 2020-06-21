@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState, } from "react";
+import { shallowEqual, useDispatch, useSelector  } from "react-redux";
 
 import Button from "../Button";
 import NumberDisplay from "../NumberDisplay";
@@ -19,7 +19,8 @@ const App: React.FC = () => {
   // console.log("  ############  ** recordas ** :  >>>> ", JSON.stringify(RecordsArray));
   const [cells, setCells]             = useState<Cell[][]>(generateCells());
   const [face, setFace]               = useState<Face>(Face.smile);
-  const [records, setRecords]         = useState<any[]>([]);
+  const [records, setRecords]         = useState<any>([]);
+  const [player, setPlayer]           = useState<string>("Anonymous");
   const [time, setTime]               = useState<number>(0);
   const [live, setLive]               = useState<boolean>(false);
   const [bombCounter, setBombCounter] = useState<number>(10);
@@ -29,18 +30,12 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       const data = await dispatch(ActionConsults.loadRecords());
-
-      console.log("  ############  ** data in useEffect ** :  >>>> ", JSON.stringify(data));
-
-      setRecords(data);
     };
 
     fetchData();
   }, []);
-  const RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.RecordsArray);
-  console.log("  ############  ** RecordsArray in useEffect ** :  >>>> ", JSON.stringify(RecordsArray));
-
-  console.log("The Records >> ", records);
+  let RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.RecordsArray);
+  console.log("  ############  ** RecordsArray in useSelector ** :  >>>> ", JSON.stringify(RecordsArray));
 
   useEffect(() => {
     const handleMouseDown = (): void => {
@@ -103,7 +98,7 @@ const App: React.FC = () => {
     }
 
     const currentCell = newCells[rowParam][colParam];
-
+    updateRecords();
     if ([CellState.flagged, CellState.visible].includes(currentCell.state)) {
       return;
     }
@@ -133,7 +128,8 @@ const App: React.FC = () => {
       }
     }
 
-    if (!safeOpenCellsExists) {  // you won!!
+    if ( !safeOpenCellsExists ) {  // you won!!
+      updateRecords();
       newCells = newCells.map(row =>
         row.map(cell => {
           if (cell.value === CellValue.bomb) {
@@ -151,6 +147,18 @@ const App: React.FC = () => {
     setCells(newCells);
   };
 
+  const updateRecords = (): void => {
+    const saveRecord = async () => {
+      const data = await dispatch(ActionConsults.saveRecord(player, time));
+
+      console.log("  ############  ** updateRecords data ** :  >>>> ", JSON.stringify(data));
+      // setRecords(records.push(data));
+    };
+    saveRecord();
+
+    RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.OneSavedGame, shallowEqual);
+  };
+
   const handleCellContext = (rowParam: number, colParam: number) => (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
   ): void => {
@@ -161,7 +169,7 @@ const App: React.FC = () => {
     }
 
     const currentCells = [...cells];
-    const currentCell = cells[rowParam][colParam];
+    const currentCell  = cells[rowParam][colParam];
 
     if (currentCell.state === CellState.visible) {
       return;
@@ -233,10 +241,11 @@ const App: React.FC = () => {
 
       <div className="records">
         <h2>Best Records</h2>
-        <table><tr><td>Points</td> <td>Name</td> <td>Done at</td></tr>
-          {RecordsArray?.map((rcd, index) => {
-            return <tr key={ index }><td> {rcd.time} </td> <td> {rcd.name} </td> <td> {rcd.createdAt} </td></tr>;
+        <table><thead><tr><td>Points</td><td>Name</td><td>Done at</td></tr></thead><tbody>
+          {RecordsArray?.map((rcd: any, index: number) => {
+            return <tr key={ index }><td>{rcd.time}</td><td>{rcd.name}</td><td>{rcd.createdAt}</td></tr>;
           })}
+        </tbody>
         </table>
       </div>
     </div>

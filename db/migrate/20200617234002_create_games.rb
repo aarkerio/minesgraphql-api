@@ -5,7 +5,7 @@ class CreateGames < ActiveRecord::Migration[6.0]
       t.string :status
       t.numeric :time
 
-      t.timestamps
+      t.timestamps, null: false, default: "NOW()"
     end
   end
 end
