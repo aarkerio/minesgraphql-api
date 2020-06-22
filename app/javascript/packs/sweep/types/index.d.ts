@@ -1,17 +1,17 @@
 export declare enum CellValue {
-    none  = 0,
-    one   = 1,
-    two   = 2,
+    none = 0,
+    one = 1,
+    two = 2,
     three = 3,
-    four  = 4,
-    five  = 5,
-    six   = 6,
+    four = 4,
+    five = 5,
+    six = 6,
     seven = 7,
     eight = 8,
-    bomb  = 9
+    bomb = 9
 }
 export declare enum CellState {
-    open    = 0,
+    open = 0,
     visible = 1,
     flagged = 2
 }

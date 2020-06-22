@@ -1,4 +1,4 @@
-import { FETCH_FAILURE, RECEIVE_RECORDS, SAVE_GAME, RESUME_GAME } from '../actions/consults';
+import { DELETE_GAME, FETCH_FAILURE, RECEIVE_RECORDS, SAVE_GAME, RESUME_GAME } from '../actions/consults';
 
 interface IState {
     RecordsArray: any;
@@ -38,6 +38,14 @@ const api_rdcr = (state: IState | object = initialState, action: any): IState | 
               isLoading: true,
               isError: false,
               OneSavedGame: action.payload
+          });
+
+      case DELETE_GAME:
+          state["RecordsArray"].push(action.payload)
+          return Object.assign({}, state, {
+              isLoading: true,
+              isError: false,
+              RecordsArray: state["RecordsArray"]
           });
 
       case FETCH_FAILURE:

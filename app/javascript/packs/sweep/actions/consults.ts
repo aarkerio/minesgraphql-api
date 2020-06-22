@@ -3,10 +3,11 @@ import { DocumentNode } from "graphql";
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import ApolloClient from 'apollo-boost';
 
-export const FETCH_FAILURE    = 'FETCH_FAILURE';
-export const RECEIVE_RECORDS  = 'RECEIVE_RECORDS';
-export const SAVE_GAME        = 'SAVE_GAME';
-export const RESUME_GAME      = 'RESUME_GAME';
+export const FETCH_FAILURE   = 'FETCH_FAILURE';
+export const RECEIVE_RECORDS = 'RECEIVE_RECORDS';
+export const SAVE_GAME       = 'SAVE_GAME';
+export const RESUME_GAME     = 'RESUME_GAME';
+export const DELETE_GAME     = 'DELETE_GAME';
 
 const API_URL = '/graphql';
 // Create the apollo client
@@ -40,11 +41,31 @@ export const saveRecord: any = (name: string, time: number) => async (dispatch: 
                                            {createRecord(name: $name, time: $time) { id name time createdAt }}`;
 
         const response = await client.mutate({mutation, variables: {name, time}});
-        console.log("  ############  ** RESPONSE SAVE RECORD ** :  >>>> ", JSON.stringify(response));
 
         dispatch({
             type: SAVE_GAME,
             payload: response.data.createRecord
+        });
+    } catch (err) {
+        console.error('Error loading data: >> ', err.toString());
+        dispatch({
+            type: FETCH_FAILURE,
+            payload: { msg: err.toString() }
+        });
+    }
+};
+
+export const deleteRecord: any = (id: number) => async (dispatch: any) => {
+    try {
+        const mutation: DocumentNode = gql`mutation DELETE_RECORD($id: Int!)
+                                           {deleteRecord(id: $id) { id }}`;
+
+        const response = await client.mutate({mutation, variables: {id}});
+        console.log("  ############  ** RESPONSE SAVE RECORD ** :  >>>> ", JSON.stringify(response));
+
+        dispatch({
+            type: DELETE_GAME,
+            payload: response.data.deleteRecord
         });
     } catch (err) {
         console.error('Error loading data: >> ', err.toString());

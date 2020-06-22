@@ -154,6 +154,18 @@ const App: React.FC = () => {
     RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.OneSavedGame, shallowEqual);
   };
 
+  const deleteRecord = (id: number): void => {
+    const removeRecord = async () => {
+      const data = await dispatch(ActionConsults.deleteRecord(id));
+
+      console.log("  ############  ** updateRecords data ** :  >>>> ", JSON.stringify(data));
+      // setRecords(records.push(data));
+    };
+    removeRecord();
+
+    RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.OneSavedGame, shallowEqual);
+  };
+
   const handleCellContext = (rowParam: number, colParam: number) => (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
   ): void => {
@@ -218,12 +230,16 @@ const App: React.FC = () => {
       })
     );
   };
+  const formatDate = (date: any) => {
+    const newDate = new Date(date);
+    return newDate.toLocaleString();
+  };
 
   return (
     <div>
       <div>
         <label>Set your name:
-          <input type="text" name="player" onChange={e => setPlayer(e.target.value) } />
+          <input type="text" name="player" onChange={e => setPlayer(e.target.value) } maxLength={10} />
         </label>
         <h2>{player}</h2>
       </div>
@@ -243,11 +259,14 @@ const App: React.FC = () => {
         <h2>Best Records</h2>
         <table>
           <thead>
-            <tr><td>Time</td><td>Name</td><td>Done at</td></tr>
+            <tr><td>Time</td><td>Name</td><td>Done at</td><td>Delete</td></tr>
           </thead>
           <tbody>
             {RecordsArray?.map((rcd: any, index: number) => {
-              return <tr key={ index }><td>{rcd.time}</td><td>{rcd.name}</td><td>{rcd.createdAt}</td></tr>;
+              return <tr key={ index }><td>{rcd.time}</td><td>{rcd.name}</td><td><img src="/icon_clock.png" alt={formatDate(rcd.createdAt)} title={formatDate(rcd.createdAt)} /></td>
+                <td><a href="#" onClick={() => window.confirm("Are you sure you wish to delete this record?") && deleteRecord(rcd.id)}>
+                  <img src="/icon_delete.png" alt="Delete" title="Delete" />
+                </a></td></tr>;
             })}
           </tbody>
         </table>
