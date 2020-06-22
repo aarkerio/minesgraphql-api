@@ -14,9 +14,6 @@ import "./App.scss";
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
-  // let RecordsArray = [];
-  // RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.RecordsArray);
-  // console.log("  ############  ** recordas ** :  >>>> ", JSON.stringify(RecordsArray));
   const [cells, setCells]             = useState<Cell[][]>(generateCells());
   const [face, setFace]               = useState<Face>(Face.smile);
   const [records, setRecords]         = useState<any>([]);
@@ -35,7 +32,6 @@ const App: React.FC = () => {
     fetchData();
   }, []);
   let RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.RecordsArray);
-  console.log("  ############  ** RecordsArray in useSelector ** :  >>>> ", JSON.stringify(RecordsArray));
 
   useEffect(() => {
     const handleMouseDown = (): void => {
@@ -98,7 +94,6 @@ const App: React.FC = () => {
     }
 
     const currentCell = newCells[rowParam][colParam];
-    updateRecords();
     if ([CellState.flagged, CellState.visible].includes(currentCell.state)) {
       return;
     }
@@ -226,6 +221,12 @@ const App: React.FC = () => {
 
   return (
     <div>
+      <div>
+        <label>Set your name:
+          <input type="text" name="player" onChange={e => setPlayer(e.target.value) } />
+        </label>
+        <h2>{player}</h2>
+      </div>
       <div className="App">
         <div className="Header">
           <NumberDisplay value={bombCounter} />
@@ -238,14 +239,17 @@ const App: React.FC = () => {
         </div>
         <div className="Body">{renderCells()}</div>
       </div>
-
       <div className="records">
         <h2>Best Records</h2>
-        <table><thead><tr><td>Points</td><td>Name</td><td>Done at</td></tr></thead><tbody>
-          {RecordsArray?.map((rcd: any, index: number) => {
-            return <tr key={ index }><td>{rcd.time}</td><td>{rcd.name}</td><td>{rcd.createdAt}</td></tr>;
-          })}
-        </tbody>
+        <table>
+          <thead>
+            <tr><td>Time</td><td>Name</td><td>Done at</td></tr>
+          </thead>
+          <tbody>
+            {RecordsArray?.map((rcd: any, index: number) => {
+              return <tr key={ index }><td>{rcd.time}</td><td>{rcd.name}</td><td>{rcd.createdAt}</td></tr>;
+            })}
+          </tbody>
         </table>
       </div>
     </div>

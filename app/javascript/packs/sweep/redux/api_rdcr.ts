@@ -1,15 +1,19 @@
 import { FETCH_FAILURE, RECEIVE_RECORDS, SAVE_GAME, RESUME_GAME } from '../actions/consults';
 
 interface IState {
-    RecordsArray:  any;
-    OneSavedGame:  any;
-    TotalNumber:   any;
+    RecordsArray: any;
+    OneSavedGame: any;
+    TotalNumber:  any;
+    isLoading:    boolean;
+    isError:      boolean;
 };
 
 const initialState: object = {
     RecordsArray:  [],
     OneSavedGame:  {},
     TotalNumber:   0,
+    isLoading: false,
+    isError: false
 };
 
 const api_rdcr = (state: IState | object = initialState, action: any): IState | object => {
@@ -22,12 +26,11 @@ const api_rdcr = (state: IState | object = initialState, action: any): IState | 
           });
 
       case SAVE_GAME:
-          const newRecordsArray: any[] = state.RecordsArray.push(action.payload);
-          console.log("  ############  ** SAVE_GAME reducer ** :  >>>> ", JSON.stringify(state));
+          state["RecordsArray"].push(action.payload)
           return Object.assign({}, state, {
               isLoading: true,
               isError: false,
-              RecordsArray: newRecordsArray
+              RecordsArray: state["RecordsArray"]
           });
 
       case RESUME_GAME:
