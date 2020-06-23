@@ -26,7 +26,7 @@ const api_rdcr = (state: IState | object = initialState, action: any): IState | 
           });
 
       case SAVE_GAME:
-          state["RecordsArray"].push(action.payload)
+          state["RecordsArray"].push(action.payload);
           return Object.assign({}, state, {
               isLoading: true,
               isError: false,
@@ -41,11 +41,13 @@ const api_rdcr = (state: IState | object = initialState, action: any): IState | 
           });
 
       case DELETE_GAME:
-          state["RecordsArray"].push(action.payload)
+          const newRecords = state["RecordsArray"].filter((value) => {
+              return value.id != action.payload;
+          });
           return Object.assign({}, state, {
               isLoading: true,
               isError: false,
-              RecordsArray: state["RecordsArray"]
+              RecordsArray: newRecords
           });
 
       case FETCH_FAILURE:

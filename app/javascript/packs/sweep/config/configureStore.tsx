@@ -2,6 +2,8 @@ import { createStore, applyMiddleware, combineReducers } from 'redux';
 import rootReducer from '../redux/index';
 import { routerReducer } from 'react-router-redux';
 import thunk from 'redux-thunk';
+import { composeWithDevTools } from 'redux-devtools-extension';
+
 declare global {
   interface Window {
     devToolsExtension: any;
@@ -15,8 +17,8 @@ const configureStore = (initialState={}) => {
       rootReducer,
       routing: routerReducer
     }),
-    initialState,
-    applyMiddleware(thunk)
+    initialState, composeWithDevTools(
+      applyMiddleware(thunk))
   );
 
   if (module.hot) {

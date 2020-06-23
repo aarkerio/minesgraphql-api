@@ -21,13 +21,11 @@ export const loadRecords: any = () => async (dispatch: any) => {
             query: gql`{
                  getRecords(limit: 6) { id name time createdAt }
             }`});
-        console.log("  ############  ** RESPONSE ** :  >>>> ", JSON.stringify(response.data.getRecords));
         dispatch({
             type: RECEIVE_RECORDS,
             payload: response.data.getRecords
         });
     } catch (err) {
-        console.error('Error loading data: >> ', err.toString());
         dispatch({
             type: FETCH_FAILURE,
             payload: { msg: err.toString() }
@@ -61,11 +59,10 @@ export const deleteRecord: any = (id: number) => async (dispatch: any) => {
                                            {deleteRecord(id: $id) { id }}`;
 
         const response = await client.mutate({mutation, variables: {id}});
-        console.log("  ############  ** RESPONSE SAVE RECORD ** :  >>>> ", JSON.stringify(response));
 
         dispatch({
             type: DELETE_GAME,
-            payload: response.data.deleteRecord
+            payload: response.data?.deleteRecord?.id
         });
     } catch (err) {
         console.error('Error loading data: >> ', err.toString());

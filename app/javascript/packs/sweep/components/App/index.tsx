@@ -16,7 +16,6 @@ const App: React.FC = () => {
   const dispatch = useDispatch();
   const [cells, setCells]             = useState<Cell[][]>(generateCells());
   const [face, setFace]               = useState<Face>(Face.smile);
-  const [records, setRecords]         = useState<any>([]);
   const [player, setPlayer]           = useState<string>("Anonymous");
   const [time, setTime]               = useState<number>(0);
   const [live, setLive]               = useState<boolean>(false);
@@ -25,13 +24,12 @@ const App: React.FC = () => {
   const [hasWon, setHasWon]           = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await dispatch(ActionConsults.loadRecords());
-    };
-
-    fetchData();
+    dispatch(ActionConsults.loadRecords());
   }, []);
-  let RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.RecordsArray);
+
+  const useRecords = () =>  useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.RecordsArray);
+
+  const RecordsArray = useRecords();
 
   useEffect(() => {
     const handleMouseDown = (): void => {
@@ -124,7 +122,6 @@ const App: React.FC = () => {
     }
 
     if ( !safeOpenCellsExists ) {  // you won!!
-      updateRecords();
       newCells = newCells.map(row =>
         row.map(cell => {
           if (cell.value === CellValue.bomb) {
@@ -137,33 +134,10 @@ const App: React.FC = () => {
         })
       );
       setHasWon(true);
+      dispatch(ActionConsults.saveRecord(player, time));
     }
 
     setCells(newCells);
-  };
-
-  const updateRecords = (): void => {
-    const saveRecord = async () => {
-      const data = await dispatch(ActionConsults.saveRecord(player, time));
-
-      console.log("  ############  ** updateRecords data ** :  >>>> ", JSON.stringify(data));
-      // setRecords(records.push(data));
-    };
-    saveRecord();
-
-    RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.OneSavedGame, shallowEqual);
-  };
-
-  const deleteRecord = (id: number): void => {
-    const removeRecord = async () => {
-      const data = await dispatch(ActionConsults.deleteRecord(id));
-
-      console.log("  ############  ** updateRecords data ** :  >>>> ", JSON.stringify(data));
-      // setRecords(records.push(data));
-    };
-    removeRecord();
-
-    RecordsArray = useSelector((state: RootRState) => (state as any).rootReducer.api_rdcr.OneSavedGame, shallowEqual);
   };
 
   const handleCellContext = (rowParam: number, colParam: number) => (
@@ -230,6 +204,7 @@ const App: React.FC = () => {
       })
     );
   };
+
   const formatDate = (date: any) => {
     const newDate = new Date(date);
     return newDate.toLocaleString();
@@ -264,7 +239,7 @@ const App: React.FC = () => {
           <tbody>
             {RecordsArray?.map((rcd: any, index: number) => {
               return <tr key={ index }><td>{rcd.time}</td><td>{rcd.name}</td><td><img src="/icon_clock.png" alt={formatDate(rcd.createdAt)} title={formatDate(rcd.createdAt)} /></td>
-                <td><a href="#" onClick={() => window.confirm("Are you sure you wish to delete this record?") && deleteRecord(rcd.id)}>
+                <td><a href="#" onClick={() => window.confirm("Are you sure you wish to delete this record?") && dispatch(ActionConsults.deleteRecord(rcd.id)) }>
                   <img src="/icon_delete.png" alt="Delete" title="Delete" />
                 </a></td></tr>;
             })}
@@ -272,7 +247,7 @@ const App: React.FC = () => {
         </table>
       </div>
     </div>
-  );
+            );
 };
 
 export default App;
