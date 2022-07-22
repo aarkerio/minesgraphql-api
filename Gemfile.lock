@@ -114,9 +114,6 @@ GEM
     ffi (1.13.1)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
-    graphiql-rails (1.7.0)
-      railties
-      sprockets-rails
     graphql (1.11.1)
     hamlit (2.11.0)
       temple (>= 0.8.2)
@@ -142,7 +139,9 @@ GEM
     marcel (0.3.3)
       mimemagic (~> 0.3.2)
     method_source (1.0.0)
-    mimemagic (0.3.5)
+    mimemagic (0.3.10)
+      nokogiri (~> 1)
+      rake
     mini_magick (4.10.1)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
@@ -273,7 +272,7 @@ GEM
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
     turbolinks-source (5.2.0)
-    tzinfo (1.2.7)
+    tzinfo (1.2.10)
       thread_safe (~> 0.1)
     unicode-display_width (1.7.0)
     warden (1.2.8)
@@ -312,7 +311,6 @@ DEPENDENCIES
   devise
   doc_ripper
   ffaker
-  graphiql-rails
   graphql
   hamlit
   hamster
